@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 带有 Spring AOP 的 Spring Bean 构造文件 -->
+<!-- 在 bean 构造文件中使用 AOP 声明 AOP 命名空间: "http://www.springframework.org/schema/aop" -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+	
+	<!-- Enable AspectJ style of Spring AOP -->
+	<!-- 加入 aop 元素在应用运行时为自动代理提供 Spring AspectJ 支持 -->
+	<aop:aspectj-autoproxy />
+	
+	<!-- 构造并初始化员工 bean -->
+	<bean name="employee" class="com.honglin_chen.spring.model.Employee">
+		<property name="name" value="陈泓霖"></property> 
+	</bean>
+	
+	<!-- 构造员工服务 bean -->
+	<bean name="employeeService" class="com.honglin_chen.spring.service.EmployeeService">
+		<!-- 初始化员工对象为名字为陈泓霖的已经通过bean文件建立好的对象 -->
+		<property name="employee" ref="employee"></property>
+	</bean>
+	
+	<!-- 构造切面 bean, 没有这些构造的切面建议将不会被执行 -->
+	<bean name="employeeAspect" class="com.honglin_chen.spring.aspect.EmployeeAspect" />
+	<bean name="employeeAspectPointcut" class="com.honglin_chen.spring.aspect.EmployeeAspectPointcut" />
+	<bean name="employeeAspectJoinPoint" class="com.honglin_chen.spring.aspect.EmployeeAspectJoinPoint" />
+	<bean name="employeeAfterAspect" class="com.honglin_chen.spring.aspect.EmployeeAfterAspect" />
+	<bean name="employeeAroundAspect" class="com.honglin_chen.spring.aspect.EmployeeAroundAspect" />
+	<bean name="employeeAnnotationAspect" class="com.honglin_chen.spring.aspect.EmployeeAnnotationAspect" />
+
+	<!-- 通过 Spring Bean 构造文件构造 Aspect (非注解方式) -->
+	<bean name="employeeXMLConfigAspect" class="com.honglin_chen.spring.aspect.EmployeeXMLConfigAspect" />
+	
+	<!-- Spring AOP XML Configuration -->
+	<aop:config>
+		<!-- 构造一个方面 -->
+		<aop:aspect ref="employeeXMLConfigAspect" id="employeeXMLConfigAspectID" order="1">
+			<!-- 定义一个 Pointcut 表达式作为 @Around 建议的参数 -->
+			<aop:pointcut expression="execution(* com.honglin_chen.spring.model.Employee.getName())" id="getNamePointcut"/>
+			<!-- 定义 @Around 建议执行的方法及其参数 -->
+			<aop:around method="employeeAroundAdvice" pointcut-ref="getNamePointcut" arg-names="proceedingJoinPoint"></aop:around>
+		</aop:aspect>	
+	</aop:config>
+</beans>
